@@ -36,47 +36,41 @@ tr:nth-child(even) {
 include "includes/connection.php";
 
 ?>
-
     <form action="" method="post">
         <textarea autofocus name="text" id="text" cols="30" rows="10" ><?=$_POST['text']?></textarea>
         <br>
         <button id="submit">submit</button>
     </form>
-
 <?php
-
-if(
-    isset($_POST['text'])
-){
-
 $sql = $_POST['text'];
-$result = $conn->query($sql);
+if($result = $conn->query($sql)) {
+    $result = $conn->query($sql);
+    $conn->close();
+    $result = $result->fetch_all(MYSQLI_ASSOC);
 
 
-if ($result->num_rows > 0) {
+    $result = object_to_table_array($result);
+
+
     echo '<table>';
-    while($row = $result->fetch_assoc()) {
-        echo'<tr>';
-        foreach ($row as $key => $value){
-            echo '<th>'.$key.'='.$value.'</th>';
+    foreach ($result as $table1) {
+        echo '<tr>';
+        foreach ($table1 as $table2) {
+            echo '<th>' . $table2 . '</th>';
         }
-        echo'<tr>';
+        echo '</tr>';
     }
-    echo '<table>';
+    echo '</table></tr>';
+} else{
 
-} else {
-    echo "0 results";
-}
-$conn->close();
+    echo $conn->error;
 }
 ?>
 
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
-
 <script>
     $('#text').keydown(function (e) {
-
         if (e.ctrlKey && e.keyCode == 13) {
             $('#submit').click();
         }
